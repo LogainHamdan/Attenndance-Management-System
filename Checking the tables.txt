@@ -1,0 +1,53 @@
+1. department:
+
+- Functional dependencies: None
+- Since there are no functional dependencies, it trivially satisfies the first condition. The primary key (dept_name) is a superkey for this relation, satisfying the second condition. Therefore, department is in BCNF.
+
+2. course:
+
+- Functional dependencies: dept_name → course_name, dept_name → credits
+- It satisfies the first condition. The primary key (course_id) is a superkey for this relation, satisfying the second condition. Therefore, course is in BCNF.
+
+3. instructor:
+
+- Functional dependencies: dept_name → name, dept_name → salary
+- It satisfies the first condition. The primary key (ID) is a superkey for this relation, satisfying the second condition. Therefore, instructor is in BCNF.
+
+3. time_slot:
+
+- Functional dependencies: None
+- It trivially satisfies the first condition. The primary key (time_slot_id, day, start_hr, start_min) is a superkey for this relation, satisfying the second condition. Therefore, time_slot is in BCNF.
+
+4. lectures:
+
+- Functional dependencies: course_id → lect_id
+- it satisfies the first condition. The primary key (lect_id) is a superkey for this relation, satisfying the second condition. Therefore, lectures is in BCNF.
+sections:
+
+Functional dependencies: None
+Since there are no functional dependencies, it trivially satisfies the first condition. The primary key (course_id, sec_id, semester, year) is a superkey for this relation, satisfying the second condition. Therefore, sections is in BCNF.
+
+5. teaches:
+
+- Functional dependencies: None
+- it trivially satisfies the first condition. The primary key (teaches_id, course_id, sec_id, semester, year) is a superkey for this relation, satisfying the second condition. Therefore, teaches is in BCNF.
+
+6. student:
+
+- Functional dependencies: None
+- it trivially satisfies the first condition. The primary key (student_id) is a superkey for this relation, satisfying the second condition. Therefore, student is in BCNF.
+
+6. takes:
+
+- Functional dependencies: None
+- it trivially satisfies the first condition. The primary key (takes_id, course_id, sec_id, semester, year) is a superkey for this relation, satisfying the second condition. Therefore, takes is in BCNF.
+
+7. users:
+
+- Functional dependencies: None
+- it trivially satisfies the first condition. The primary key (user_id) is a superkey for this relation, satisfying the second condition. Therefore, users is in BCNF.
+
+8. attendance:
+
+- Functional dependencies: None
+- it trivially satisfies the first condition. The primary key (record_id) is a superkey for this relation, satisfying the second condition. Therefore, attendance is in BCNF.

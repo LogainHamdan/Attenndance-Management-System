@@ -1,0 +1,84 @@
+1. Display the list of students who attended less than 25% of
+lectures.
+
+SELECT s.student_id, s.student_name 
+                              FROM student s 
+                              JOIN takes t ON s.student_id = t.student_id 
+                              JOIN attendance a ON t.takes_id = a.takes_id 
+                              GROUP BY s.student_id, s.student_name
+                              HAVING COUNT(DISTINCT a.lect_id) / COUNT(DISTINCT t.takes_id) < 0.25
+
+2. What are the top 10 most attended lectures of all time?
+
+SELECT l.lect_id, l.course_id, c.course_name, COUNT(a.record_id) AS attendance_count
+            FROM lectures l
+            JOIN course c ON l.course_id = c.course_id 
+            LEFT JOIN attendance a ON l.lect_id = a.lect_id 
+            GROUP BY l.lect_id, l.course_id, c.course_name 
+            ORDER BY attendance_count DESC 
+            LIMIT 10
+
+3. For each student who attended more than 80% of all lectures,
+show the lectures he or she did not attend.
+
+SELECT s.student_id, s.student_name, l.lect_id, c.course_name 
+            FROM student s 
+            INNER JOIN takes t ON s.student_id = t.student_id 
+            INNER JOIN sections sec ON t.course_id = sec.course_id 
+              AND t.sec_id = sec.sec_id 
+             AND t.semester = sec.semester
+            AND t.year = sec.year 
+            INNER JOIN lectures l ON sec.course_id = l.course_id 
+            INNER JOIN course c ON l.course_id = c.course_id
+            LEFT JOIN attendance a ON l.lect_id = a.lect_id 
+             AND a.student_id = s.student_id " +
+           WHERE l.lect_date <= CURRENT_DATE -- Only consider past lectures
+            GROUP BY s.student_id, s.student_name, l.lect_id, c.course_name 
+            HAVING COUNT(*) * 100.0 / COUNT(DISTINCT l.lect_id) > 80.0 
+             AND COUNT(a.record_id) = 0
+
+4. Display the students ordered by their ‘commitment’ from the
+most committed to the least.
+
+SELECT s.student_id, s.student_name, COUNT(a.record_id) AS attendance_count 
+            FROM student s 
+            LEFT JOIN attendance a ON s.student_id = a.student_id 
+           GROUP BY s.student_id, s.student_name 
+            ORDER BY attendance_count DESC
+
+5. What are the lectures that had more students missing that
+lecture than actually attending it? (if a student joined after
+that lecture, we should not count him as absent)
+
+SELECT l.lect_id, c.course_name, COUNT(a.student_id) AS attendance_count,
+            (SELECT COUNT(*) FROM student WHERE student_id NOT IN 
+            (SELECT student_id FROM attendance WHERE lect_id = l.lect_id)) AS absence_count 
+            FROM lectures l 
+            INNER JOIN course c ON l.course_id = c.course_id 
+            LEFT JOIN attendance a ON l.lect_id = a.lect_id 
+            GROUP BY l.lect_id, c.course_name 
+            HAVING (SELECT COUNT(*) FROM student WHERE student_id NOT IN 
+            (SELECT student_id FROM attendance WHERE lect_id = l.lect_id)) > COUNT(a.student_id)
+
+
+6. Display the list of students who missed 3 consecutive
+lectures.
+
+ SELECT s.student_id, s.student_name 
+            FROM student s 
+            JOIN takes t ON s.student_id = t.student_id 
+            JOIN sections sec ON t.course_id = sec.course_id 
+           AND t.sec_id = sec.sec_id 
+            AND t.semester = sec.semester 
+            AND t.year = sec.year
+          LEFT JOIN lectures l ON sec.course_id = l.course_id
+            AND l.lect_date BETWEEN (SELECT MIN(lect_date) FROM lectures) AND (SELECT MAX(lect_date) FROM lectures) 
+            LEFT JOIN attendance a ON l.lect_id = a.lect_id 
+            AND a.student_id = s.student_id 
+           WHERE a.record_id IS NULL 
+           AND (SELECT COUNT(DISTINCT l1.lect_date) 
+           FROM lectures l1 
+           WHERE l1.lect_date BETWEEN l.lect_date AND (l.lect_date + INTERVAL '2 day')) = 3 
+         GROUP BY s.student_id, s.student_name
+
+
